@@ -1,4 +1,4 @@
-import os;
+import os, sys;
 
 class LineChars:
     Vertical = "│";
@@ -10,59 +10,119 @@ class LineChars:
     
 class Stack:
     def __init__(self):
-        self.__items = []
+        self.__items = [];
 
     def isEmpty(self):
-        return len(self.__items) == 0
+        return self.__items == [];
 
     def push(self,p):
-        self.__items.append(p)
+        self.__items.append(p);
 
     def pop(self):
-        return self.__items.pop()
+        return self.__items.pop();
         
     def size(self):
         return len(self.__items);
         
     def peak(self):
         return self.__items[len(self.__items) - 1];
+        
+    def __str__(self):
+        return str(self.__items);
     
+
 class Queue:
     def __init__(self):
-        self.__items = []
+        self.__items = [];
 
     def isEmpty(self):
-        return self.__items == []
+        return self.__items == [];
 
     def enqueue(self, item):
-        self.__items.insert(0,item)
+        self.__items.insert(0,item);
 
     def dequeue(self):
-        return self.__items.pop()
+        return self.__items.pop();
 
     def size(self):
-        return len(self.__items)
+        return len(self.__items);
+        
+    def __str__(self):
+        return str(self.__items);
   
 
   
 def getCurrentDirectory():
     return os.path.dirname(os.path.realpath(__file__));
+        
 
 def containsSubDirectories(dir):
-    return len(os.listdir(dir)) > 0;
-    
-def getSubDirectories(dir):
-    return [name for name in os.listdir(dir)
-            if os.path.isdir(os.path.join(dir, name))]
-            
+    try:
+        return len(os.listdir(dir)) > 0;
+    except:
+        return False;
+   
+   
 def getSubDirectoryQueue(dir):
     res = Queue();
     
-    for name in os.listdir(dir):
-        if os.path.isdir(os.path.join(dir, name)):
-            res.enqueue(name);
+    try:
+        for name in os.listdir(dir):
+            if os.path.isdir(os.path.join(dir, name)):
+                res.enqueue(name);
+    except:
+        pass;
     
     return res;
+        
+       
+def traverseDirectories(path):
+    
+    # Detect invalid input
+    if (path == None):
+        raise ValueError("Path value cannot be None.");
+    elif (not os.path.isdir(path)):
+        raise ValueError("The provided directory, '" + path + "' does not exist.");
+
+    # Get a queue of all of the sub directories
+    sub_dirs = getSubDirectoryQueue(path);
+    
+    # Determine if there are any subdirectories
+    if (sub_dirs.isEmpty()):
+        return;
+    
+    # Declare the stack, and add the first set of sub directories
+    dir_structures = Stack();
+    dir_structures.push(("", sub_dirs));
+    
+    while (not dir_structures.isEmpty()):
+        # Peak at the top element on the stack
+        current_tree, current_sub_dirs = dir_structures.peak();
+        
+        while (not current_sub_dirs.isEmpty()):        
+            # Get and print the current directory
+            dir = current_sub_dirs.dequeue();
+            next_tree = printDirectory(dir, not current_sub_dirs.isEmpty(), current_tree);
+            
+            # Get the new directory path and sub directories
+            path = os.path.join(path, dir);
+            sub_dirs = getSubDirectoryQueue(path);
+            
+            if (not sub_dirs.isEmpty()):
+                # Add any subdirectories to the stack
+                dir_structures.push((next_tree, sub_dirs));
+                current_sub_dirs = sub_dirs;
+                break;
+            else:
+                #navigate the path back one dir 
+                path, _ = os.path.split(path);
+            
+                
+        # Remove top item from the stack when all directories are visited
+        if (current_sub_dirs.isEmpty()):
+            dir_structures.pop();
+            path, _ = os.path.split(path); #navigate the path back one dir 
+   
 
 def printDirectory(dir_name, has_sibling = False, tree_structure = None):
     
@@ -93,55 +153,54 @@ def printDirectory(dir_name, has_sibling = False, tree_structure = None):
         output += LineChars.BottomLeftCorner;
         
     # Print the current directory tree structure
-    print(line + LineChars.Horizontal + LineChars.Horizontal + LineChars.Horizontal + dir_name);
+    print(output + LineChars.Horizontal + LineChars.Horizontal + LineChars.Horizontal + dir_name);
     
-    return result_tree;
+    return result_tree;   
         
-       
-def traverseDirectories(path = None):
+        
 
-    if (not os.path.isdir(None)):
-        raise ValueError("The provided directory, '" + path + "' does not exist.");
+def main(argv):
 
-    # Get a queue of all of the sub directories
-    sub_dirs = getSubDirectoryQueue();
-    
-    # Determine if there are any subdirectories
-    if (sub_dirs.isEmpty()):
-        return False;
-    
-    
-    dir_structures = Stack();
-    dir_structures.push(("", sub_dirs));
-    
-    
-    # Depth First Search
-    # Stack containing current Tree Structure as well as a Queue of sub directories
-    # - while stack isnt empty 
-    #   - Add all sub-directories of current dir to new queue
-    #   - Push the current tree and queue onto the stack
-    #   - while current queue isnt empty
-    #       - print top directory
-    #       - if current dir has sub-dirs
-    #           - set current dir equal to the current dir
-    #           - break
-    #   - if queue is empty
-    #       - go back one directory
-    
-    
-    while (dir_structures.isEmpty()):
-        
-        current_tree = dir_structures.peak();
-        
-        
-    
-    return True;
-    
-        
-# tree = printDirectory("dir1", True);
-# tree = printDirectory("dir2", False, tree);
-# tree1 = printDirectory("dir3", True, tree);
-# tree1 = printDirectory("dir4", False, tree1);
-# tree1 = printDirectory("dir4-1", False, tree1);
-# tree = printDirectory("dir5", False, tree);
+    path = "";
 
+    # Get the first argument as a path name
+    if (len(argv) > 1):
+        path = argv[1];
+        
+        try:
+            if (not os.path.isabs(path)):
+                path = os.path.abspath(path);
+                
+            if (not os.path.exists(path)):
+                print("The provided directory does not exist.");
+                return;
+                
+        except:
+            print("Invalid directory value.");
+            return;
+    else:
+        path = getCurrentDirectory();
+    
+    
+    if (containsSubDirectories(path)):
+        # Print out the description of the traversal
+        msg = "Folder path visualization for ";
+        if (len(argv) > 1):
+            print(msg + "the specified directory:");
+            print(path);
+        else:
+            drive, _ = os.path.splitdrive(path)
+            print(msg + "the current directory:");
+            print(drive + "\\.");
+        
+        
+        # Perform the traversal
+        traverseDirectories(path)
+    else:    
+        print("Directory does not contain any sub directories.");
+
+
+
+# Run the program with input arguments
+if (__name__ == "__main__"):
+    main(sys.argv);
