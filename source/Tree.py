@@ -5,8 +5,7 @@
 #******************************************************************************
 
 import os;
-from Stack import Stack;
-from Queue import Queue;
+from queue import Queue;
 
 
 
@@ -62,7 +61,7 @@ def getSubDirectoryQueue(path):
     try:
         for name in os.listdir(path):
             if os.path.isdir(os.path.join(path, name)):
-                res.enqueue(name);
+                res.put(name);
     except:
         pass;
     
@@ -89,29 +88,29 @@ def traverseDirectories(path):
     sub_dirs = getSubDirectoryQueue(path);
     
     # Determine if there are any subdirectories
-    if (sub_dirs.isEmpty()):
+    if (sub_dirs.empty()):
         return;
     
     # Declare the stack, and add the first set of sub directories
-    dir_structures = Stack();
-    dir_structures.push(("", sub_dirs));
+    dir_structures = [];
+    dir_structures.append(("", sub_dirs));
     
-    while (not dir_structures.isEmpty()):
+    while (dir_structures):
         # Peak at the top element on the stack
-        current_tree, current_sub_dirs = dir_structures.peak();
+        current_tree, current_sub_dirs = dir_structures[-1];
         
-        while (not current_sub_dirs.isEmpty()):        
+        while (not current_sub_dirs.empty()):        
             # Get and print the current directory
-            dir = current_sub_dirs.dequeue();
-            next_tree = printDirectory(dir, not current_sub_dirs.isEmpty(), current_tree);
+            dir = current_sub_dirs.get();
+            next_tree = printDirectory(dir, not current_sub_dirs.empty(), current_tree);
             
             # Get the new directory path and sub directories
             path = os.path.join(path, dir);
             sub_dirs = getSubDirectoryQueue(path);
             
-            if (not sub_dirs.isEmpty()):
+            if (not sub_dirs.empty()):
                 # Add any subdirectories to the stack
-                dir_structures.push((next_tree, sub_dirs));
+                dir_structures.append((next_tree, sub_dirs));
                 current_sub_dirs = sub_dirs;
                 break;
             else:
@@ -120,7 +119,7 @@ def traverseDirectories(path):
             
                 
         # Remove top item from the stack when all directories are visited
-        if (current_sub_dirs.isEmpty()):
+        if (current_sub_dirs.empty()):
             dir_structures.pop();
             path, _ = os.path.split(path); #navigate the path back one dir 
    
