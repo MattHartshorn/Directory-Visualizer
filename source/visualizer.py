@@ -45,7 +45,7 @@ def main(argv):
         # Perform the traversal
         Tree.traverseDirectories(path)
     else:    
-        print("Directory does not contain any sub directories.");
+        print("Directory does not contain any sub-directories.");
 
 
 

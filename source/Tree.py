@@ -41,10 +41,13 @@ def containsSubDirectories(path):
     """
     
     try:
-        return len(os.listdir(path)) > 0;
+        for name in os.listdir(path):
+            if os.path.isdir(os.path.join(path, name)):
+                return True;
     except:
-        return False;
-   
+        pass;
+        
+    return False;
 
 def getSubDirectoryQueue(path):
     """
