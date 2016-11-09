@@ -1,6 +1,20 @@
-import os, sys;
+#******************************************************************************
+#   Author: Matt Hartsorn
+#   Description: Implementation of the traversal and printing of the 
+#                directories
+#******************************************************************************
+
+import os;
+from Stack import Stack;
+from Queue import Queue;
+
+
 
 class LineChars:
+    """
+    Contains all the required characters used to draw the directories.
+    """
+    
     Vertical = "│";
     Horizontal = "─";
     TopLeftCorner = "┌";
@@ -8,75 +22,59 @@ class LineChars:
     DownRight = "├";
     
     
-class Stack:
-    def __init__(self):
-        self.__items = [];
 
-    def isEmpty(self):
-        return self.__items == [];
-
-    def push(self,p):
-        self.__items.append(p);
-
-    def pop(self):
-        return self.__items.pop();
-        
-    def size(self):
-        return len(self.__items);
-        
-    def peak(self):
-        return self.__items[len(self.__items) - 1];
-        
-    def __str__(self):
-        return str(self.__items);
-    
-
-class Queue:
-    def __init__(self):
-        self.__items = [];
-
-    def isEmpty(self):
-        return self.__items == [];
-
-    def enqueue(self, item):
-        self.__items.insert(0,item);
-
-    def dequeue(self):
-        return self.__items.pop();
-
-    def size(self):
-        return len(self.__items);
-        
-    def __str__(self):
-        return str(self.__items);
-  
-
-  
 def getCurrentDirectory():
+    """
+    Returns the current working directory.
+    
+    @return: The full path of the current working directory.
+    """
     return os.path.dirname(os.path.realpath(__file__));
         
 
-def containsSubDirectories(dir):
+def containsSubDirectories(path):
+    """
+    Returns whether or not the provided directory contains any sub-directories.
+
+    @param path: Full path of the desired directory to search
+    @return: True if the provided path contains sub directories, otherwise false.
+    """
+    
     try:
-        return len(os.listdir(dir)) > 0;
+        return len(os.listdir(path)) > 0;
     except:
         return False;
    
-   
-def getSubDirectoryQueue(dir):
+
+def getSubDirectoryQueue(path):
+    """
+    Returns a queue containing all the sub-directories of the provided path.
+    
+    @param path: Full path of the desired directory to search
+    @return: A queue that contains all the sub-directories of the provided path.
+    @notes: An empty queue is returned if permission to the provided path is denied.
+    """
     res = Queue();
     
     try:
-        for name in os.listdir(dir):
-            if os.path.isdir(os.path.join(dir, name)):
+        for name in os.listdir(path):
+            if os.path.isdir(os.path.join(path, name)):
                 res.enqueue(name);
     except:
         pass;
     
     return res;
         
+
        
 def traverseDirectories(path):
+    """
+    Traverses all the sub-directories of the provided directory. All the 
+    directories are printed out as they are visited.
+    
+    @param path: Full path of the desired directory to traverse
+    """ 
+    
     
     # Detect invalid input
     if (path == None):
@@ -125,6 +123,16 @@ def traverseDirectories(path):
    
 
 def printDirectory(dir_name, has_sibling = False, tree_structure = None):
+    """
+    Prints out the provided directory name following the supplied tree structure.
+    
+    @param dir_name: Name of the directory that will be printed
+    @param has_sibling: True if the provided directory has one or more siblings
+    @param tree_structure: String representing the current tree structure of the visited nodes
+    
+    @return: The modified tree structure based on if the provided directory has any siblings.
+    """
+    
     
     # Detect invalid tree input, must be a string
     if (tree_structure != None and not isinstance(tree_structure, str)):
@@ -155,52 +163,4 @@ def printDirectory(dir_name, has_sibling = False, tree_structure = None):
     # Print the current directory tree structure
     print(output + LineChars.Horizontal + LineChars.Horizontal + LineChars.Horizontal + dir_name);
     
-    return result_tree;   
-        
-        
-
-def main(argv):
-
-    path = "";
-
-    # Get the first argument as a path name
-    if (len(argv) > 1):
-        path = argv[1];
-        
-        try:
-            if (not os.path.isabs(path)):
-                path = os.path.abspath(path);
-                
-            if (not os.path.exists(path)):
-                print("The provided directory does not exist.");
-                return;
-                
-        except:
-            print("Invalid directory value.");
-            return;
-    else:
-        path = getCurrentDirectory();
-    
-    
-    if (containsSubDirectories(path)):
-        # Print out the description of the traversal
-        msg = "Folder path visualization for ";
-        if (len(argv) > 1):
-            print(msg + "the specified directory:");
-            print(path);
-        else:
-            drive, _ = os.path.splitdrive(path)
-            print(msg + "the current directory:");
-            print(drive + "\\.");
-        
-        
-        # Perform the traversal
-        traverseDirectories(path)
-    else:    
-        print("Directory does not contain any sub directories.");
-
-
-
-# Run the program with input arguments
-if (__name__ == "__main__"):
-    main(sys.argv);
+    return result_tree;
