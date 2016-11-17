@@ -4,11 +4,12 @@
 #******************************************************************************
 
 import os, sys;
-import Tree;
+import tree;
 
 
-def main(argv):
+def main():
 
+    argv = sys.argv;
     path = "";
 
     # Get the first argument as a path name
@@ -27,10 +28,10 @@ def main(argv):
             print("Invalid directory value.");
             return;
     else:
-        path = Tree.getCurrentDirectory();
+        path = tree.getCurrentDirectory();
     
     
-    if (Tree.containsSubDirectories(path)):
+    if (tree.containsSubDirectories(path)):
         # Print out the description of the traversal
         msg = "Folder path visualization for ";
         if (len(argv) > 1):
@@ -43,12 +44,10 @@ def main(argv):
         
         
         # Perform the traversal
-        Tree.traverseDirectories(path)
+        tree.traverseDirectories(path)
     else:    
         print("Directory does not contain any sub-directories.");
 
 
 
-# Run the program with input arguments
-if (__name__ == "__main__"):
-    main(sys.argv);
+main();
