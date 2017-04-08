@@ -1,6 +1,5 @@
-=====================
-Directory-Visualizer
-=====================
+# Directory-Visualizer
+
 
 Visualize the tree structure of any directory in a **command line environment**. Print all the sub-directories of either the current or provided directory. This script provides a quick way of visualizing the depth and hierarchy of a directory structure.
 
