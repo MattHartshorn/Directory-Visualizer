@@ -4,8 +4,8 @@
 #                directories
 #******************************************************************************
 
-import os;
-from queue import Queue;
+import os
+from queue import Queue
 
 
 
@@ -14,11 +14,11 @@ class LineChars:
     Contains all the required characters used to draw the directories.
     """
     
-    Vertical = "│";
-    Horizontal = "─";
-    TopLeftCorner = "┌";
-    BottomLeftCorner = "└";
-    DownRight = "├";
+    Vertical = "│"
+    Horizontal = "─"
+    TopLeftCorner = "┌"
+    BottomLeftCorner = "└"
+    DownRight = "├"
     
     
 
@@ -28,7 +28,7 @@ def getCurrentDirectory():
     
     @return: The full path of the current working directory.
     """
-    return os.path.dirname(os.path.realpath(__file__));
+    return os.path.dirname(os.path.realpath(__file__))
         
 
 def containsSubDirectories(path):
@@ -42,11 +42,11 @@ def containsSubDirectories(path):
     try:
         for name in os.listdir(path):
             if os.path.isdir(os.path.join(path, name)):
-                return True;
+                return True
     except:
-        pass;
+        pass
         
-    return False;
+    return False
 
 def getSubDirectoryQueue(path):
     """
@@ -56,16 +56,16 @@ def getSubDirectoryQueue(path):
     @return: A queue that contains all the sub-directories of the provided path.
     @notes: An empty queue is returned if permission to the provided path is denied.
     """
-    res = Queue();
+    res = Queue()
     
     try:
         for name in os.listdir(path):
             if os.path.isdir(os.path.join(path, name)):
-                res.put(name);
+                res.put(name)
     except:
-        pass;
+        pass
     
-    return res;
+    return res
         
 
        
@@ -80,48 +80,48 @@ def traverseDirectories(path):
     
     # Detect invalid input
     if (path == None):
-        raise ValueError("Path value cannot be None.");
+        raise ValueError("Path value cannot be None.")
     elif (not os.path.isdir(path)):
-        raise ValueError("The provided directory, '" + path + "' does not exist.");
+        raise ValueError("The provided directory, '" + path + "' does not exist.")
 
     # Get a queue of all of the sub directories
-    sub_dirs = getSubDirectoryQueue(path);
+    sub_dirs = getSubDirectoryQueue(path)
     
     # Determine if there are any subdirectories
     if (sub_dirs.empty()):
-        return;
+        return
     
     # Declare the stack, and add the first set of sub directories
-    dir_structures = [];
-    dir_structures.append(("", sub_dirs));
+    dir_structures = []
+    dir_structures.append(("", sub_dirs))
     
     while (dir_structures):
         # Peak at the top element on the stack
-        current_tree, current_sub_dirs = dir_structures[-1];
+        current_tree, current_sub_dirs = dir_structures[-1]
         
         while (not current_sub_dirs.empty()):        
             # Get and print the current directory
-            dir = current_sub_dirs.get();
-            next_tree = printDirectory(dir, not current_sub_dirs.empty(), current_tree);
+            dir = current_sub_dirs.get()
+            next_tree = printDirectory(dir, not current_sub_dirs.empty(), current_tree)
             
             # Get the new directory path and sub directories
-            path = os.path.join(path, dir);
-            sub_dirs = getSubDirectoryQueue(path);
+            path = os.path.join(path, dir)
+            sub_dirs = getSubDirectoryQueue(path)
             
             if (not sub_dirs.empty()):
                 # Add any subdirectories to the stack
-                dir_structures.append((next_tree, sub_dirs));
-                current_sub_dirs = sub_dirs;
-                break;
+                dir_structures.append((next_tree, sub_dirs))
+                current_sub_dirs = sub_dirs
+                break
             else:
                 #navigate the path back one dir 
-                path, _ = os.path.split(path);
+                path, _ = os.path.split(path)
             
                 
         # Remove top item from the stack when all directories are visited
         if (current_sub_dirs.empty()):
-            dir_structures.pop();
-            path, _ = os.path.split(path); #navigate the path back one dir 
+            dir_structures.pop()
+            path, _ = os.path.split(path) #navigate the path back one dir 
    
 
 def printDirectory(dir_name, has_sibling = False, tree_structure = None):
@@ -138,31 +138,31 @@ def printDirectory(dir_name, has_sibling = False, tree_structure = None):
     
     # Detect invalid tree input, must be a string
     if (tree_structure != None and not isinstance(tree_structure, str)):
-        raise ValueError("'tree_structure' must be a string");
+        raise ValueError("'tree_structure' must be a string")
     
     # Create the resulting tree structure that is returned
-    result_tree = "    ";
+    result_tree = "    "
     
     # Add vertical line if the current dir has a 
     if (has_sibling):
-        result_tree = LineChars.Vertical + "   ";
+        result_tree = LineChars.Vertical + "   "
         
-    output = "";
+    output = ""
     
     # Update the resulting tree structure and the line that will be printed
     if (tree_structure != None):
-        result_tree = tree_structure + result_tree;
-        output = tree_structure;
+        result_tree = tree_structure + result_tree
+        output = tree_structure
         
     # Change the starting character of the output based on if there is a sibling or it is the first dir in the tree
     if (tree_structure != None and has_sibling):
-        output += LineChars.DownRight;
+        output += LineChars.DownRight
     elif (tree_structure == None and has_sibling):
-        output += LineChars.TopLeftCorner;
+        output += LineChars.TopLeftCorner
     else:
-        output += LineChars.BottomLeftCorner;
+        output += LineChars.BottomLeftCorner
         
     # Print the current directory tree structure
-    print(output + LineChars.Horizontal + LineChars.Horizontal + LineChars.Horizontal + dir_name);
+    print(output + LineChars.Horizontal + LineChars.Horizontal + LineChars.Horizontal + dir_name)
     
-    return result_tree;
+    return result_tree
